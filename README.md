@@ -1,7 +1,8 @@
 # SensitivityMap
 
 [![CI](https://github.com/kapildhinwa2010-dev/SensitivityMap/actions/workflows/ci.yml/badge.svg)](https://github.com/kapildhinwa2010-dev/SensitivityMap/actions/workflows/ci.yml)
-[![CI](https://github.com/kapildhinwa2010-dev/SensitivityMap/actions/workflows/codeql.yml/badge.svg)](https://github.com/kapildhinwa2010-dev/SensitivityMap/actions/workflows/codeql.yml)
+[![CodeQL](https://github.com/kapildhinwa2010-dev/SensitivityMap/actions/workflows/codeql.yml/badge.svg)](https://github.com/kapildhinwa2010-dev/SensitivityMap/actions/workflows/codeql.yml)
+
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
