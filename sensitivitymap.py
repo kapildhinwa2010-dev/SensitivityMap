@@ -53,7 +53,12 @@ def layer_report(weights: np.ndarray) -> dict:
         "shape": (int(weights.shape[0]), int(weights.shape[1])),
         "frobenius_norm": float(np.linalg.norm(weights)),
         "spectral_norm": s_max,
-        "condition_number": (s_max / s_min) if s_min > 0 else float("inf"),
+        # Numerically singular: s_min below machine-eps scale => inf
+        "condition_number": (
+            s_max / s_min
+            if s_min > s_max * np.finfo(np.float64).eps * max(weights.shape)
+            else float("inf")
+        ),
         "effective_rank": effective_rank(weights),
     }
 
