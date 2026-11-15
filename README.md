@@ -1,18 +1,42 @@
 # SensitivityMap
 
-> Map output sensitivity
+Layer-wise spectral analysis for deep networks.
 
-## Project status
+**Part of the [Kapildhinwa2010-dev Toolkit](https://github.com/kapildhinwa2010-dev/Kapildhinwa2010-dev).**
 
-This repository is an idea-stage scaffold created from the project roadmap. It currently contains documentation only; implementation, benchmarks, and research results have not yet been added or verified.
+![CI](https://github.com/kapildhinwa2010-dev/SensitivityMap/actions/workflows/ci.yml/badge.svg)
+![CodeQL](https://github.com/kapildhinwa2010-dev/SensitivityMap/actions/workflows/codeql.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-## Scope
+## ✨ Features
 
-The proposed scope is: Map output sensitivity.
+- Singular-value spectra and effective rank per layer
+- Condition numbers and bottleneck ranking
+- `analyze_model()` reports every layer at once
 
-## Next steps
+## 📦 Install
 
-- Define requirements and a minimal, testable milestone.
-- Choose the implementation stack and document dependencies.
-- Add tests before claiming functionality.
-- Review security, licensing, and resource requirements before release.
+```bash
+pip install -r requirements.txt
+```
+
+## 🚀 Quick start
+
+```python
+from sensitivitymap import analyze_model, find_bottlenecks
+
+layers = {'a': np.eye(16), 'b': low_rank_matrix}
+reports = analyze_model(layers)
+print(find_bottlenecks(reports, top_k=1))
+```
+
+## 🧪 Tests
+
+```bash
+pytest tests/ -v
+```
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE).
