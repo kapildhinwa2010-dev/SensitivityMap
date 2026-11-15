@@ -18,6 +18,8 @@ __all__ = [
     "layer_report",
     "analyze_model",
     "find_bottlenecks",
+    "row_sensitivity",
+    "sensitivity_map",
 ]
 
 
@@ -78,3 +80,52 @@ def find_bottlenecks(reports: dict, top_k: int = 1) -> list:
         raise ValueError("top_k must be >= 1")
     ranked = sorted(reports.items(), key=lambda kv: (kv[1]["effective_rank"], kv[0]))
     return [name for name, _ in ranked[:top_k]]
+
+
+def row_sensitivity(weights: np.ndarray, samples: int = 64, eps: float = 1e-2, seed: int = 0) -> np.ndarray:
+    """Relative output change when each row of ``weights`` is perturbed.
+
+    For each row i, the input X is fixed and the row is scaled by
+    (1 + eps); the score is mean |(WX_perturbed - WX)| / max|WX| over
+    the sample batch. Rows with near-zero output contribution score ~0.
+
+    Args:
+        weights: 2-D weight matrix (out_features, in_features).
+        samples: number of random input vectors.
+        eps: relative row perturbation size.
+
+    Returns: array of shape (out_features,) with per-row scores.
+    """
+    weights = np.asarray(weights, dtype=np.float64)
+    if weights.ndim != 2 or weights.size == 0:
+        raise ValueError("weights must be a non-empty 2-D matrix")
+    if samples < 1:
+        raise ValueError("samples must be >= 1")
+    if eps <= 0:
+        raise ValueError("eps must be > 0")
+    rng = np.random.default_rng(seed)
+    X = rng.standard_normal((samples, weights.shape[1]))
+    base = X @ weights.T
+    denom = np.abs(base).max()
+    if denom == 0.0:
+        return np.zeros(weights.shape[0])
+    scores = np.zeros(weights.shape[0])
+    for i in range(weights.shape[0]):
+        perturbed = weights.copy()
+        perturbed[i] *= (1.0 + eps)
+        delta = np.abs((X @ perturbed.T) - base).mean() / denom
+        scores[i] = float(delta)
+    return scores
+
+
+def sensitivity_map(layers: dict, samples: int = 64, eps: float = 1e-2, seed: int = 0) -> dict:
+    """Row sensitivity scores for every layer in a {name: matrix} dict.
+
+    Returns dict {layer_name: (out_features,) score array}.
+    """
+    if not layers:
+        raise ValueError("layers must be non-empty")
+    return {
+        name: row_sensitivity(w, samples=samples, eps=eps, seed=seed)
+        for name, w in layers.items()
+    }
